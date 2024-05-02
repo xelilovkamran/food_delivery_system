@@ -1,0 +1,2 @@
+id, email, password, balance, is_superuser
+1, "xlilovkamran@gmail.com", "123456", 100, true 
