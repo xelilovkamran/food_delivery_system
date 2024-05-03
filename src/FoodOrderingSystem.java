@@ -29,7 +29,7 @@ class FoodOrderingSystem {
     private List<Order> orderHistory;
 
     public FoodOrderingSystem() {
-        menu = new FoodItem[MAX_ITEMS];
+        // menu = new FoodItem[MAX_ITEMS];
         itemCount = 0;
         cart = new FoodItem[MAX_ITEMS];
         cartSize = 0;
@@ -37,22 +37,91 @@ class FoodOrderingSystem {
         orderHistory = new ArrayList<>();
     }
 
-    public void addItemToMenu(String name, double price) {
-        if (itemCount < MAX_ITEMS) {
-            menu[itemCount] = new FoodItem(name, price);
-            itemCount++;
-            System.out.println("Item added successfully.");
-        } else {
-            System.out.println("Menu is full. Cannot add more items.");
+    public void displayMenu() {
+        List<String[]> menuFromCSV = CSVOperations.loadMenu("data/menu.csv");
+        System.out.println("Menu:");
+        for (String[] item : menuFromCSV) {
+            System.err.println(item[4].trim());
+            System.out.println(item[0] + ". " + item[1] + " - $" + item[2] + " - " + item[3] + " - " + (item[4].trim().equals("true") ? "Available" : "Not Available"));
         }
     }
 
-    public void displayMenu() {
-        System.out.println("Menu:");
-        for (int i = 0; i < itemCount; i++) {
-            System.out.println((i + 1) + ". " + menu[i].getName() + " - $" + menu[i].getPrice());
+    public void addItemToMenu(String name, double price, String description) {
+        List<String[]> menuFromCSV = CSVOperations.loadMenu("data/menu.csv");
+
+        for (String[] item : menuFromCSV) {
+            if (item[1].trim().toLowerCase().equals(name.trim().toLowerCase())) {
+                System.out.println("Item already exists in the menu.");
+                return;
+            }
         }
+
+        Integer id = Integer.parseInt(menuFromCSV.get(menuFromCSV.size() - 1)[0]);
+        String newLine = (id + 1) + ",  " + name + ",  " + price + ",  " + description + ",  true";
+        CSVOperations.AddLineToFile("data/menu.csv", newLine);
+        System.out.println("Item added successfully.");
     }
+
+    public static void updateItemInMenu() {
+        Scanner scanner = new Scanner(System.in);
+        List<String[]> menuFromCSV = CSVOperations.loadMenu("data/menu.csv");
+        List<String[]> newMenu = new ArrayList<>();
+        
+        System.out.print("Enter item name to update: ");
+        String name = scanner.next();
+        System.err.println(name);
+
+        if (!CSVOperations.itemIsAvailableInMenu("data/menu.csv", name)) {
+            System.out.println("Item not found in the menu.");
+            return;
+        }
+
+        System.out.print("Change price (press '.' to pass): ");
+        String price = scanner.next();
+        scanner.nextLine(); // Consume newline
+        System.out.print("Change description (press '.' to pass): ");
+        String description = scanner.nextLine();
+        System.out.print("Change availability (use 'true' and 'false' keywords, press '.' to pass): ");
+        String isAvailable = scanner.nextLine();
+
+        for (String[] item : menuFromCSV) {
+            if (item[1].trim().toLowerCase().equals(name.trim().toLowerCase())) {
+                if (!price.equals(".")) {
+                    item[2] = Double.parseDouble(price) + "";
+                }
+                if (!description.equals(".")) {
+                    item[3] = "\""  + description + "\"";
+                }
+                if (!isAvailable.equals(".")) {
+                    item[4] = isAvailable;
+                }
+            }
+            newMenu.add(item);
+        }
+        CSVOperations.writeMenu("data/menu.csv", newMenu);
+        System.out.println("Updating item in menu...");
+
+    }
+
+    public void removeItemFromMenu(String name) {
+        if (!CSVOperations.itemIsAvailableInMenu("data/menu.csv", name)) {
+            System.out.println("Item not found in the menu.");
+            return;
+        }
+        List<String[]> menuFromCSV = CSVOperations.loadMenu("data/menu.csv");
+        List<String[]> newMenu = new ArrayList<>();
+        
+        for (String[] item : menuFromCSV) {
+            if (item[1].trim().toLowerCase().equals(name.trim().toLowerCase())) {
+                continue;
+            }
+            newMenu.add(item);
+        }
+
+        CSVOperations.writeMenu("data/menu.csv", newMenu);
+        System.out.println("Removing item from menu...");
+    }
+
 
     public void addToCart(int itemIndex) {
         if (cartSize < MAX_ITEMS && itemIndex >= 0 && itemIndex < itemCount) {
@@ -152,7 +221,11 @@ class FoodOrderingSystem {
                     customerActions(system, scanner);
                     break;
                 case 2:
-                    managerActions(system, scanner);
+                    if ( Validation.isAdmin() ){
+                        managerActions(system, scanner);
+                        break;
+                    }
+                    System.out.println("You are not authorized to access this feature.");
                     break;
                 case 3:
                     System.out.println("Exiting...");
@@ -225,29 +298,45 @@ class FoodOrderingSystem {
         int choice;
         do {
             System.out.println("\nManager Actions:");
-            System.out.println("1. Add Item to Menu");
-            System.out.println("2. Display Menu");
-            System.out.println("3. Back to User Type Selection");
+            System.out.println("1. Display Menu");
+            System.out.println("2. Add Item to Menu");
+            System.out.println("3. Remove Item from Menu");
+            System.out.println("4. Update Item in Menu");
+            System.out.println("5. Back to User Type Selection");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
 
             switch (choice) {
                 case 1:
+                    system.displayMenu();
+                    break;
+                case 2:
                     System.out.print("Enter item name: ");
                     String name = scanner.next();
                     System.out.print("Enter item price: ");
-                    double price = scanner.nextDouble();
-                    system.addItemToMenu(name, price);
-                    break;
-                case 2:
-                    system.displayMenu();
+                    double price = Double.parseDouble(scanner.next());
+                    scanner.nextLine(); // Consume newline
+                    System.out.print("Enter item description: ");
+                    String description = scanner.nextLine();
+                    description = "\"" + description + "\"";
+                    System.out.println("Adding item to menu...");
+                    system.addItemToMenu(name, price, description);
+
                     break;
                 case 3:
+                    System.out.print("Enter item name to remove: ");
+                    String itemName = scanner.next();
+                    system.removeItemFromMenu(itemName);
+                    break;
+                case 4:
+                    updateItemInMenu();
+                    break;
+                case 5:
                     System.out.println("Returning to user type selection...");
                     break;
                 default:
                     System.out.println("Invalid choice. Please enter a number between 1 and 3.");
             }
-        } while (choice != 3);
+        } while (choice != 5);
     }
 }
