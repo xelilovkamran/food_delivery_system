@@ -1,26 +1,35 @@
 import java.util.List;
-import java.util.Scanner;
 
 public class Validation {
-    public static boolean isAdmin() {
-        Scanner scanner = new Scanner(System.in);
-        String email = null; 
-        String password = null;
+    public static boolean Authenticated(String email, String password, User user) {
+        String userEmail = user.getEmail();
+        String userPassword = user.getPassword();
+        if (userEmail.equals(email) && userPassword.equals(password)) {
+            return true;
+        }
 
-        System.out.print("Enter email: ");
-        email = scanner.next();
-        System.out.print("Enter password: ");
-        password = scanner.next();
-        // scanner.close();
+        return false;
+    }
+
+    public static boolean isAdmin(String email, String password) {
+        List<User> users = CSVOperations.loadUsers("data/users.csv");
         
-        List<String[]> users = CSVOperations.loadUsers("data/users.csv");
+        for (User user : users) {
+            boolean is_superuser = user.isSuperuser();
+            if (Validation.Authenticated(email, password, user) && is_superuser) {
+                return true;
+            }
+        }
 
+        return false;
+    }
 
-        for (String[] user : users) {
-            String userEmail = user[2].trim().substring(1, user[2].length() - 2);
-            String userPassword = user[3].trim().substring(1, user[3].length() - 2);
-            String is_superuser = user[5].trim();
-            if (userEmail.equals(email) && userPassword.equals(password) && is_superuser.equals("true")) {
+    public static boolean isCustomer(String email, String password) {
+        List<User> users = CSVOperations.loadUsers("data/users.csv");
+        
+        for (User user : users) {
+            boolean is_superuser = user.isSuperuser();
+            if (Validation.Authenticated(email, password, user) && !is_superuser) {
                 return true;
             }
         }

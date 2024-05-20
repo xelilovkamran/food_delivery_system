@@ -1,231 +1,60 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-
-class Order {
-    private List<FoodItem> items;
-
-    public Order() {
-        items = new ArrayList<>();
-    }
-
-    public void addItem(FoodItem item) {
-        items.add(item);
-    }
-
-    public List<FoodItem> getItems() {
-        return items;
-    }
-}
-
 class FoodOrderingSystem {
-    private static final int MAX_ITEMS = 100;
-    private FoodItem[] menu;
-    private int itemCount;
-    private FoodItem[] cart;
-    private int cartSize;
-    private double balance;
-    private List<Order> orderHistory;
-
-    public FoodOrderingSystem() {
-        // menu = new FoodItem[MAX_ITEMS];
-        itemCount = 0;
-        cart = new FoodItem[MAX_ITEMS];
-        cartSize = 0;
-        balance = 100.0; // Initial balance
-        orderHistory = new ArrayList<>();
-    }
-
-    public void displayMenu() {
-        List<String[]> menuFromCSV = CSVOperations.loadMenu("data/menu.csv");
-        System.out.println("Menu:");
-        for (String[] item : menuFromCSV) {
-            System.err.println(item[4].trim());
-            System.out.println(item[0] + ". " + item[1] + " - $" + item[2] + " - " + item[3] + " - " + (item[4].trim().equals("true") ? "Available" : "Not Available"));
-        }
-    }
-
-    public void addItemToMenu(String name, double price, String description) {
-        List<String[]> menuFromCSV = CSVOperations.loadMenu("data/menu.csv");
-
-        for (String[] item : menuFromCSV) {
-            if (item[1].trim().toLowerCase().equals(name.trim().toLowerCase())) {
-                System.out.println("Item already exists in the menu.");
-                return;
-            }
-        }
-
-        Integer id = Integer.parseInt(menuFromCSV.get(menuFromCSV.size() - 1)[0]);
-        String newLine = (id + 1) + ",  " + name + ",  " + price + ",  " + description + ",  true";
-        CSVOperations.AddLineToFile("data/menu.csv", newLine);
-        System.out.println("Item added successfully.");
-    }
-
-    public static void updateItemInMenu() {
-        Scanner scanner = new Scanner(System.in);
-        List<String[]> menuFromCSV = CSVOperations.loadMenu("data/menu.csv");
-        List<String[]> newMenu = new ArrayList<>();
-        
-        System.out.print("Enter item name to update: ");
-        String name = scanner.next();
-        System.err.println(name);
-
-        if (!CSVOperations.itemIsAvailableInMenu("data/menu.csv", name)) {
-            System.out.println("Item not found in the menu.");
-            return;
-        }
-
-        System.out.print("Change price (press '.' to pass): ");
-        String price = scanner.next();
-        scanner.nextLine(); // Consume newline
-        System.out.print("Change description (press '.' to pass): ");
-        String description = scanner.nextLine();
-        System.out.print("Change availability (use 'true' and 'false' keywords, press '.' to pass): ");
-        String isAvailable = scanner.nextLine();
-
-        for (String[] item : menuFromCSV) {
-            if (item[1].trim().toLowerCase().equals(name.trim().toLowerCase())) {
-                if (!price.equals(".")) {
-                    item[2] = Double.parseDouble(price) + "";
-                }
-                if (!description.equals(".")) {
-                    item[3] = "\""  + description + "\"";
-                }
-                if (!isAvailable.equals(".")) {
-                    item[4] = isAvailable;
-                }
-            }
-            newMenu.add(item);
-        }
-        CSVOperations.writeMenu("data/menu.csv", newMenu);
-        System.out.println("Updating item in menu...");
-
-    }
-
-    public void removeItemFromMenu(String name) {
-        if (!CSVOperations.itemIsAvailableInMenu("data/menu.csv", name)) {
-            System.out.println("Item not found in the menu.");
-            return;
-        }
-        List<String[]> menuFromCSV = CSVOperations.loadMenu("data/menu.csv");
-        List<String[]> newMenu = new ArrayList<>();
-        
-        for (String[] item : menuFromCSV) {
-            if (item[1].trim().toLowerCase().equals(name.trim().toLowerCase())) {
-                continue;
-            }
-            newMenu.add(item);
-        }
-
-        CSVOperations.writeMenu("data/menu.csv", newMenu);
-        System.out.println("Removing item from menu...");
-    }
-
-
-    public void addToCart(int itemIndex) {
-        if (cartSize < MAX_ITEMS && itemIndex >= 0 && itemIndex < itemCount) {
-            cart[cartSize] = menu[itemIndex];
-            cartSize++;
-            System.out.println("Item added to cart.");
-        } else {
-            System.out.println("Invalid item selection.");
-        }
-    }
-
-    public void removeFromCart(int itemIndex) {
-        if (itemIndex >= 0 && itemIndex < cartSize) {
-            for (int i = itemIndex; i < cartSize - 1; i++) {
-                cart[i] = cart[i + 1];
-            }
-            cartSize--;
-            System.out.println("Item removed from cart.");
-        } else {
-            System.out.println("Invalid item selection.");
-        }
-    }
-
-    public void displayCart() {
-        System.out.println("Cart:");
-        double total = 0;
-        for (int i = 0; i < cartSize; i++) {
-            System.out.println((i + 1) + ". " + cart[i].getName() + " - $" + cart[i].getPrice());
-            total += cart[i].getPrice();
-        }
-        System.out.println("Total: $" + total);
-    }
-
-    public void checkBalance() {
-        System.out.println("Your balance: $" + balance);
-    }
-
-    public void rechargeBalance(double amount) {
-        balance += amount;
-        System.out.println("Balance recharged successfully. Your new balance is: $" + balance);
-    }
-
-    public void placeOrder() {
-        if (cartSize == 0) {
-            System.out.println("Your cart is empty. Add items to cart before placing an order.");
-            return;
-        }
-
-        double total = 0;
-        for (int i = 0; i < cartSize; i++) {
-            total += cart[i].getPrice();
-        }
-        if (total > balance) {
-            System.out.println("Insufficient balance. Please remove some items from cart or recharge your balance.");
-        } else {
-            balance -= total;
-            Order order = new Order();
-            for (FoodItem item : cart) {
-                order.addItem(item);
-            }
-            orderHistory.add(order);
-            System.out.println("Order placed successfully!");
-            cart = new FoodItem[MAX_ITEMS]; // Empty the cart after placing order
-            cartSize = 0;
-        }
-    }
-
-    public void viewOrderHistory() {
-        System.out.println("Order History:");
-        for (int i = 0; i < orderHistory.size(); i++) {
-            Order order = orderHistory.get(i);
-            List<FoodItem> items = order.getItems();
-            System.out.println("Order " + (i + 1) + ":");
-            for (FoodItem item : items) {
-                System.out.println("- " + item.getName() + " - $" + item.getPrice());
-            }
-        }
-    }
-
     public static void main(String[] args) {
         FoodOrderingSystem system = new FoodOrderingSystem();
         Scanner scanner = new Scanner(System.in);
+        int choice;
 
         System.out.println("Welcome to Online Food Delivery System");
 
-        int userType;
         do {
-            System.out.println("\nSelect User Type:");
-            System.out.println("1. Customer");
-            System.out.println("2. Manager");
+            System.out.println("\n1. Sign In");
+            System.out.println("2. Sign Up");
             System.out.println("3. Exit");
             System.out.print("Enter your choice: ");
-            userType = scanner.nextInt();
 
-            switch (userType) {
+            choice = scanner.nextInt();
+
+            switch (choice) {
                 case 1:
-                    customerActions(system, scanner);
+                    System.out.print("Enter email: ");
+                    String email = scanner.next();
+                    System.out.print("Enter password: ");
+                    String password = scanner.next();
+
+                    if (Validation.isCustomer(email, password)) {
+                        customerActions(system, scanner, email, password);
+                    } else if (Validation.isAdmin(email, password)) {
+                        managerActions(system, scanner, email, password);
+                    } else {
+                        System.out.println("You are not authorized to access this feature.");
+                    }
                     break;
                 case 2:
-                    if ( Validation.isAdmin() ){
-                        managerActions(system, scanner);
-                        break;
+                    System.out.print("Enter email address: ");
+                    email = scanner.next();
+                    System.out.print("Enter name: ");
+                    String name = scanner.next();
+                    System.out.print("Enter password: ");
+                    password = scanner.next();
+                    System.out.print("Repeat password: ");
+                    String repeatedPassword = scanner.next();
+
+                    if (password.equals(repeatedPassword)) {
+                        List<String[]> userLines = CSVOperations.getFileLines("data/users.csv");
+                        if (!CSVOperations.userIsAvailableInUsers(userLines, email)) {
+                            userLines.add(new String[] { Integer.toString(userLines.size() + 1), name, email, password, "0", "false" });
+                            CSVOperations.writeUsers("data/users.csv", userLines);
+                            customerActions(system, scanner, email, password);
+                        } else {
+                            System.out.println("Email already exists.");
+                        }
+                    } else {
+                        System.out.println("Passwords do not match.");
                     }
-                    System.out.println("You are not authorized to access this feature.");
+                    
                     break;
                 case 3:
                     System.out.println("Exiting...");
@@ -233,110 +62,147 @@ class FoodOrderingSystem {
                 default:
                     System.out.println("Invalid choice. Please enter a number between 1 and 3.");
             }
-        } while (userType != 3);
+        } while (choice != 3);
+
+
+        
 
         scanner.close();
     }
 
-    public static void customerActions(FoodOrderingSystem system, Scanner scanner) {
-        int choice;
-        do {
-            System.out.println("\nCustomer Actions:");
-            System.out.println("1. Display Menu");
-            System.out.println("2. Add Item to Cart");
-            System.out.println("3. Remove Item from Cart");
-            System.out.println("4. View Cart");
-            System.out.println("5. Check Balance");
-            System.out.println("6. Recharge Balance");
-            System.out.println("7. Place Order");
-            System.out.println("8. View Order History");
-            System.out.println("9. Back to User Type Selection");
-            System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
+    public static void customerActions(FoodOrderingSystem system, Scanner scanner, String email, String password) {
+        // int choice;
+        User user = CSVOperations.getUser(email, password);
+        System.out.println(user.getName());
+        // do {
+        //     System.out.println("\nCustomer Actions:");
+        //     System.out.println("1. Display Menu");
+        //     System.out.println("2. Add Item to Cart");
+        //     System.out.println("3. Remove Item from Cart");
+        //     System.out.println("4. View Cart");
+        //     System.out.println("5. Check Balance");
+        //     System.out.println("6. Recharge Balance");
+        //     System.out.println("7. Place Order");
+        //     System.out.println("8. View Order History");
+        //     System.out.println("9. Back to User Type Selection");
+        //     System.out.print("Enter your choice: ");
+        //     choice = scanner.nextInt();
 
-            switch (choice) {
-                case 1:
-                    system.displayMenu();
-                    break;
-                case 2:
-                    System.out.print("Enter item number to add to cart: ");
-                    int itemIndex = scanner.nextInt() - 1;
-                    system.addToCart(itemIndex);
-                    break;
-                case 3:
-                    System.out.print("Enter item number to remove from cart: ");
-                    int removeIndex = scanner.nextInt() - 1;
-                    system.removeFromCart(removeIndex);
-                    break;
-                case 4:
-                    system.displayCart();
-                    break;
-                case 5:
-                    system.checkBalance();
-                    break;
-                case 6:
-                    System.out.print("Enter amount to recharge: $");
-                    double amount = scanner.nextDouble();
-                    system.rechargeBalance(amount);
-                    break;
-                case 7:
-                    system.placeOrder();
-                    break;
-                case 8:
-                    system.viewOrderHistory();
-                    break;
-                case 9:
-                    System.out.println("Returning to user type selection...");
-                    break;
-                default:
-                    System.out.println("Invalid choice. Please enter a number between 1 and 9.");
-            }
-        } while (choice != 9);
+        //     switch (choice) {
+        //         case 1:
+        //             user.displayMenu();
+        //             break;
+        //         case 2:
+        //             System.out.print("Enter item number to add to cart: ");
+        //             int itemIndex = scanner.nextInt() - 1;
+        //             user.addToCart(itemIndex);
+        //             break;
+        //         case 3:
+        //             System.out.print("Enter item number to remove from cart: ");
+        //             int removeIndex = scanner.nextInt() - 1;
+        //             user.removeFromCart(removeIndex);
+        //             break;
+        //         case 4:
+        //             user.displayCart();
+        //             break;
+        //         case 5:
+        //             user.checkBalance();
+        //             break;
+        //         case 6:
+        //             System.out.print("Enter amount to recharge: $");
+        //             double amount = scanner.nextDouble();
+        //             user.rechargeBalance(amount);
+        //             break;
+        //         case 7:
+        //             user.placeOrder();
+        //             break;
+        //         case 8:
+        //             user.viewOrderHistory();
+        //             break;
+        //         case 9:
+        //             System.out.println("Returning to user type selection...");
+        //             break;
+        //         default:
+        //             System.out.println("Invalid choice. Please enter a number between 1 and 9.");
+        //     }
+        // } while (choice != 9);
     }
 
-    public static void managerActions(FoodOrderingSystem system, Scanner scanner) {
+    public static void managerActions(FoodOrderingSystem system, Scanner scanner, String email, String password) {
         int choice;
+        Admin admin = CSVOperations.getAdmin(email, password);
+        Menu menu = CSVOperations.loadMenu("data/menu.csv");
+
         do {
             System.out.println("\nManager Actions:");
-            System.out.println("1. Display Menu");
-            System.out.println("2. Add Item to Menu");
-            System.out.println("3. Remove Item from Menu");
-            System.out.println("4. Update Item in Menu");
-            System.out.println("5. Back to User Type Selection");
+            System.out.println("********************* Account Actions *********************");
+            System.out.println("1. Display Account Information");
+            System.out.println("2. Change Password");
+            System.out.println("3. Change Email");
+            System.out.println("********************* Store Actions *********************");
+            System.out.println("4. Display Menu");
+            System.out.println("5. Add Item to Menu");
+            System.out.println("6. Remove Item from Menu");
+            System.out.println("7. Update Item in Menu");
+            System.out.println("8. Exit");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
 
             switch (choice) {
                 case 1:
-                    system.displayMenu();
+                    System.out.println(admin.getUserInfo());
                     break;
                 case 2:
-                    System.out.print("Enter item name: ");
-                    String name = scanner.next();
-                    System.out.print("Enter item price: ");
-                    double price = Double.parseDouble(scanner.next());
-                    scanner.nextLine(); // Consume newline
-                    System.out.print("Enter item description: ");
-                    String description = scanner.nextLine();
-                    description = "\"" + description + "\"";
-                    System.out.println("Adding item to menu...");
-                    system.addItemToMenu(name, price, description);
-
+                    System.out.print("Enter new password: ");
+                    String newPassword = scanner.next();
+                    admin.setPassword(newPassword);
                     break;
                 case 3:
-                    System.out.print("Enter item name to remove: ");
-                    String itemName = scanner.next();
-                    system.removeItemFromMenu(itemName);
+                    System.out.print("Enter new email: ");
+                    String newEmail = scanner.next();
+                    admin.setEmail(newEmail);
                     break;
                 case 4:
-                    updateItemInMenu();
+                    menu.displayMenu();
                     break;
                 case 5:
-                    System.out.println("Returning to user type selection...");
+                    String name, description;
+                    double price;
+                    boolean isAvailable;
+
+                    System.out.print("Enter item name: ");
+                    name = scanner.next();
+                    scanner.nextLine();
+
+                    System.out.println("Enter item price: ");
+                    price = Double.parseDouble(scanner.nextLine());
+
+                    System.out.println("Enter item description: ");
+                    description = scanner.nextLine();
+
+                    System.out.println("Is item available? (true/false): ");
+                    isAvailable = Boolean.parseBoolean(scanner.nextLine());
+
+                    FoodItem item = new FoodItem(name, price, description, isAvailable);
+                    menu.addItem(item);
+                    break;
+                case 6:
+                    System.out.print("Enter item name to remove: ");
+                    String itemName = scanner.next();
+                    System.out.println(itemName);
+                    menu.removeItem(itemName);
+                    break;
+                case 7:
+                    System.out.print("Enter item name to update: ");
+                    itemName = scanner.next();
+                    menu.updateItem(itemName);
+                    break;
+                case 8:
+                    System.out.println("Exiting...");
                     break;
                 default:
                     System.out.println("Invalid choice. Please enter a number between 1 and 3.");
             }
-        } while (choice != 5);
+        } while (choice != 8);
     }
 }
