@@ -1,7 +1,8 @@
 id,  name,  price,  description,  is_available
-2,  burger,  9.5,  this is a burger,  false
-3,  fries,  5.0,  This is a fries,  true
-4,  hamburger,  6.0,  This is a hamburger,  true
-5,  pizza,  8.0,  this is a pizza,  true
-6,  hotdog,  5.6,  this is a hotdog,  true
-7,  pasta,  3.0,  this is a pasta,  true
+2,   burger,   9.5,   this is a burger,   false
+3,   fries,   5.0,   This is a fries,   true
+4,   hamburger,   6.0,   This is a hamburger,   true
+5,   pizza,   8.0,   this is a pizza,   true
+6,   hotdog,   5.6,   this is a hotdog,   true
+7,   pasta,   3.0,   this is a pasta,   true
+8, Bozbas, 2.5, It is a bozbas, true

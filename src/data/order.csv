@@ -1,1 +1,1 @@
-food_in_cart, delivery_type, delivery_address, payment_type, order_amount, status, addiional_notes, created_at, updated_at
+food, user_id, amount, total_price, delivery_address, payment_type, restaurant_id, is_paid, additional_notes, created_at
