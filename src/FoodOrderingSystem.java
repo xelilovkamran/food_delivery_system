@@ -3,7 +3,6 @@ import java.util.Scanner;
 
 class FoodOrderingSystem {
     public static void main(String[] args) {
-        FoodOrderingSystem system = new FoodOrderingSystem();
         Scanner scanner = new Scanner(System.in);
         int choice;
 
@@ -25,9 +24,9 @@ class FoodOrderingSystem {
                     String password = scanner.next();
 
                     if (Validation.isCustomer(email, password)) {
-                        customerActions(system, scanner, email, password);
+                        customerActions( scanner, email, password);
                     } else if (Validation.isAdmin(email, password)) {
-                        managerActions(system, scanner, email, password);
+                        managerActions( scanner, email, password);
                     } else {
                         System.out.println("You are not authorized to access this feature.");
                     }
@@ -47,7 +46,7 @@ class FoodOrderingSystem {
                         if (!CSVOperations.userIsAvailableInUsers(userLines, email)) {
                             userLines.add(new String[] { Integer.toString(userLines.size() + 1), name, email, password, "0", "false" });
                             CSVOperations.writeUsers("data/users.csv", userLines);
-                            customerActions(system, scanner, email, password);
+                            customerActions( scanner, email, password);
                         } else {
                             System.out.println("Email already exists.");
                         }
@@ -70,7 +69,7 @@ class FoodOrderingSystem {
         scanner.close();
     }
 
-    public static void customerActions(FoodOrderingSystem system, Scanner scanner, String email, String password) {
+    public static void customerActions(Scanner scanner, String email, String password) {
         // int choice;
         User user = CSVOperations.getUser(email, password);
         System.out.println(user.getName());
@@ -128,7 +127,7 @@ class FoodOrderingSystem {
         // } while (choice != 9);
     }
 
-    public static void managerActions(FoodOrderingSystem system, Scanner scanner, String email, String password) {
+    public static void managerActions(Scanner scanner, String email, String password) {
         int choice;
         Admin admin = CSVOperations.getAdmin(email, password);
         Menu menu = CSVOperations.loadMenu("data/menu.csv");

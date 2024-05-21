@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -41,8 +40,8 @@ public class Menu {
 
         Scanner scanner = new Scanner(System.in);
 
-        for (int i = 0; i < items.size(); i++) {
-            if (items.get(i).getName().equals(itemName)) {
+        for (int i = 0; i < this.items.size(); i++) {
+            if (this.items.get(i).getName().equals(itemName)) {
                 found = true;
 
                 System.out.println("Enter new name: (type . to keep the same name)");
@@ -87,6 +86,5 @@ public class Menu {
 
         CSVOperations.writeMenu( "./data/menu.csv", lines);
 
-        // scanner.close();
     }
 }
