@@ -12,20 +12,20 @@ public class Menu {
         System.out.println("\nMenu:");
         for (int i = 0; i < items.size(); i++) {
             FoodItem item = items.get(i);
-            System.out.println((i + 1) + ". " + item.getFoodInfo());
+            if (item.isAvailable())
+                System.out.println((i + 1) + ". " + item.getFoodInfo());
         }
     }
 
-    public void addItem(FoodItem item) {
-        CSVOperations.addItemToMenu(item, "./data/menu.csv");
+    public void addItem(FoodItem item, Integer restaurantId) {
+        CSVOperations.addItemToMenu(item, restaurantId,  "./data/menu.csv");
         items.add(item);
     }
 
-    public void removeItem(String itemName) {
-        CSVOperations.removeItemFromMenu(itemName, "./data/menu.csv");
+    public void removeItem(String itemName, Restaurant restaurant) {
+        CSVOperations.removeItemFromMenu(itemName, restaurant, "./data/menu.csv");
         
         for (int i = 0; i < items.size(); i++) {
-            System.out.println(items.get(i).getName());
             if (items.get(i).getName().equals(itemName)) {
                 System.out.println("Item removed.");
                 items.remove(i);
@@ -34,19 +34,19 @@ public class Menu {
         }
     }
 
-    public void updateItem(String itemName) {
+    public void updateItem(String itemName, String restaurant_name, String restaurant_address) {
         boolean found = false;
         List<String[]> lines = CSVOperations.getFileLines("./data/menu.csv");
 
         Scanner scanner = new Scanner(System.in);
+        Restaurant restaurant = CSVOperations.getRestaurantByNameAndAddress(restaurant_name, restaurant_address);
 
         for (int i = 0; i < this.items.size(); i++) {
-            if (this.items.get(i).getName().equals(itemName)) {
+            if (this.items.get(i).getName().equals(itemName) && this.items.get(i).getRestaurantId() == restaurant.getId()) {
                 found = true;
 
                 System.out.println("Enter new name: (type . to keep the same name)");
                 String name = scanner.nextLine();
-                // scanner.nextLine();
                 if (!name.equals("."))
                     items.get(i).setName(name);
 
@@ -57,11 +57,11 @@ public class Menu {
 
                 System.out.println("Enter new description: (type . to keep the same description)");
                 String description = scanner.nextLine();
-                // scanner.nextLine();
                 if (!description.equals("."))
                     items.get(i).setDescription(description);
 
-                System.out.println("Is item available? (true/false): ");
+                String availability = items.get(i).isAvailable() ? "available" : "not available: ";
+                System.out.println("Is item available? (true/false) (" + availability + ")");
                 boolean isAvailable = Boolean.parseBoolean(scanner.nextLine());
 
                 if (isAvailable != items.get(i).isAvailable())
@@ -72,7 +72,7 @@ public class Menu {
         }
 
         if (!found) {
-            System.out.println("Item not found.");
+            System.out.println("Item or restaurant not found.");
         }
 
         for (int i = 0; i < lines.size(); i++) {

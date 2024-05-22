@@ -128,80 +128,173 @@ class FoodOrderingSystem {
     }
 
     public static void managerActions(Scanner scanner, String email, String password) {
-        int choice;
+        int choice = -1;
         Admin admin = CSVOperations.getAdmin(email, password);
         Menu menu = CSVOperations.loadMenu("data/menu.csv");
 
         do {
             System.out.println("\nManager Actions:");
+            System.out.println("********************* Admin Actions *********************");
+            System.out.println("1. Add new Admin");
+            System.out.println("2. Add new Restaurant");
             System.out.println("********************* Account Actions *********************");
-            System.out.println("1. Display Account Information");
-            System.out.println("2. Change Password");
-            System.out.println("3. Change Email");
+            System.out.println("3 Display Account Information");
+            System.out.println("4. Change Password");
+            System.out.println("5. Change Email");
             System.out.println("********************* Store Actions *********************");
-            System.out.println("4. Display Menu");
-            System.out.println("5. Add Item to Menu");
-            System.out.println("6. Remove Item from Menu");
-            System.out.println("7. Update Item in Menu");
-            System.out.println("8. Exit");
+            System.out.println("6. Display Menu");
+            System.out.println("7. Add Item to Menu");
+            System.out.println("8. Remove Item from Menu");
+            System.out.println("9. Update Item in Menu");
+            System.out.println("10. Exit");
             System.out.print("Enter your choice: ");
-            choice = scanner.nextInt();
+
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.next();
+                continue;
+            }
+
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
-                    System.out.println(admin.getUserInfo());
+                    System.out.print("Enter email address: ");
+                    String newEmail = scanner.next();
+                    System.out.print("Enter name: ");
+                    String name = scanner.next();
+                    System.out.print("Enter password: ");
+                    String newPassword = scanner.next();
+                    System.out.print("Repeat password: ");
+                    String repeatedPassword = scanner.next();
+
+                    if (newPassword.equals(repeatedPassword)) {
+                        List<String[]> userLines = CSVOperations.getFileLines("data/users.csv");
+                        if (!CSVOperations.userIsAvailableInUsers(userLines, newEmail)) {
+                            userLines.add(new String[] { Integer.toString(userLines.size() + 1), name, newEmail, newPassword, "0", "true" });
+                            CSVOperations.writeUsers("data/users.csv", userLines);
+                        } else {
+                            System.out.println("Email already exists.");
+                        }
+                    } else {
+                        System.out.println("Passwords do not match.");
+                    }
                     break;
                 case 2:
-                    System.out.print("Enter new password: ");
-                    String newPassword = scanner.next();
-                    admin.setPassword(newPassword);
+                    System.out.print("Enter restaurant name: ");
+                    String restaurantName = scanner.nextLine();
+                    System.out.print("Enter restaurant address: ");
+                    String restaurantAddress = scanner.nextLine();
+
+                    Restaurant restaurant = new Restaurant(-1, restaurantName, restaurantAddress);
+                    CSVOperations.addRestaurant(restaurant);
                     break;
                 case 3:
-                    System.out.print("Enter new email: ");
-                    String newEmail = scanner.next();
-                    admin.setEmail(newEmail);
+                    System.out.println(admin.getUserInfo());
                     break;
                 case 4:
-                    menu.displayMenu();
+                    System.out.print("Enter new password: ");
+                    newPassword = scanner.next();
+                    admin.setPassword(newPassword);
                     break;
                 case 5:
-                    String name, description;
+                    System.out.print("Enter new email: ");
+                    newEmail = scanner.next();
+                    admin.setEmail(newEmail);
+                    break;
+                case 6:
+                    menu.displayMenu();
+                    break;
+                case 7:
+                    String description;
                     double price;
                     boolean isAvailable;
 
                     System.out.print("Enter item name: ");
-                    name = scanner.next();
-                    scanner.nextLine();
+                    name = scanner.nextLine();
 
                     System.out.println("Enter item price: ");
-                    price = Double.parseDouble(scanner.nextLine());
+
+                    if (scanner.hasNextDouble()) {
+                        price = scanner.nextDouble();
+                    } else {
+                        System.out.println("Invalid input. Please enter a valid price.");
+                        scanner.next();
+                        break;
+                    }
+                    scanner.nextLine();
 
                     System.out.println("Enter item description: ");
                     description = scanner.nextLine();
-
+                    
                     System.out.println("Is item available? (true/false): ");
-                    isAvailable = Boolean.parseBoolean(scanner.nextLine());
+                    if (scanner.hasNextBoolean()) {
+                        isAvailable = scanner.nextBoolean();
+                    } else {
+                        System.out.println("Invalid input. Please enter true or false.");
+                        scanner.next();
+                        break;
+                    }
+                    scanner.nextLine();
 
-                    FoodItem item = new FoodItem(name, price, description, isAvailable);
-                    menu.addItem(item);
-                    break;
-                case 6:
-                    System.out.print("Enter item name to remove: ");
-                    String itemName = scanner.next();
-                    System.out.println(itemName);
-                    menu.removeItem(itemName);
-                    break;
-                case 7:
-                    System.out.print("Enter item name to update: ");
-                    itemName = scanner.next();
-                    menu.updateItem(itemName);
+                    System.out.println("Enter restaurant name: ");
+                    String restaurant_name = scanner.nextLine();
+
+                    System.out.println("Enter restaurant address: ");
+                    String restaurant_address = scanner.nextLine();
+
+                    restaurant = CSVOperations.getRestaurantByNameAndAddress(restaurant_name, restaurant_address);
+
+                    if (restaurant == null) {
+                        System.out.println("Restaurant not found.");
+                    } else {
+                        FoodItem item = new FoodItem(name, price, description, isAvailable, restaurant.getId());
+                        menu.addItem(item, restaurant.getId());
+                    }
+
                     break;
                 case 8:
+                    System.out.print("Enter item name to remove: ");
+                    String itemName = scanner.nextLine();
+                    System.out.print("Enter restaurant name: ");
+                    restaurant_name = scanner.nextLine();
+                    System.out.print("Enter restaurant address: ");
+                    restaurant_address = scanner.nextLine();
+
+                    restaurant = CSVOperations.getRestaurantByNameAndAddress(restaurant_name, restaurant_address);
+
+                    if (restaurant == null) {
+                        System.out.println("Restaurant not found.");
+                    } else {
+                        menu.removeItem(itemName, restaurant);
+                    }
+
+                    break;
+                case 9:
+                    System.out.print("Enter item name to update: ");
+                    itemName = scanner.nextLine();
+                    System.out.print("Enter restaurant name: ");
+                    restaurant_name = scanner.nextLine();
+                    System.out.print("Enter restaurant address: ");
+                    restaurant_address = scanner.nextLine();
+
+                    restaurant = CSVOperations.getRestaurantByNameAndAddress(restaurant_name, restaurant_address);
+
+                    if (restaurant == null) {
+                        System.out.println("Restaurant not found.");
+                    } else {
+                        menu.updateItem(itemName, restaurant_name, restaurant_address);
+                    }
+
+                    break;
+                case 10:
                     System.out.println("Exiting...");
                     break;
                 default:
                     System.out.println("Invalid choice. Please enter a number between 1 and 3.");
             }
-        } while (choice != 8);
+        } while (choice != 10);
     }
 }

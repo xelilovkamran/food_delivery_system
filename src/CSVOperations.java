@@ -117,21 +117,22 @@ public class CSVOperations {
             double price = Double.parseDouble(item[2].trim());
             String description = item[3].trim();
             boolean is_available = item[4].trim().equals("true");
-            FoodItem newItem = new FoodItem(name, price, description, is_available);
+            int restaurant_id = Integer.parseInt(item[5].trim());
+            FoodItem newItem = new FoodItem(name, price, description, is_available, restaurant_id);
             items.add(newItem);
         }
 
         return new Menu(items);
     }
 
-    public static void addItemToMenu(FoodItem item, String path) {
+    public static void addItemToMenu(FoodItem item, Integer restaurantId, String path) {
         List<String[]> lines = new ArrayList<>();
         String line;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             while ((line = br.readLine()) != null) {
                 String[] cells = line.split(",");
-                if (cells[1].trim().equals(item.getName())) {
+                if (cells[1].trim().equals(item.getName()) && Integer.parseInt(cells[5].trim()) == restaurantId) {
                     System.out.println("Item already exists.");
                     return;
                 }
@@ -146,7 +147,7 @@ public class CSVOperations {
             FileWriter fw = new FileWriter(path, true);
             BufferedWriter bw = new BufferedWriter(fw);
 
-            bw.write((lines.size() + 1) + ", " + item.getName() + ", " + item.getPrice() + ", " + item.getDescription() + ", " + item.isAvailable());
+            bw.write((lines.size() + 1) + ", " + item.getName() + ", " + item.getPrice() + ", " + item.getDescription() + ", " + item.isAvailable() + ", " + item.getRestaurantId());
             bw.newLine();
 
             bw.close();
@@ -155,7 +156,7 @@ public class CSVOperations {
         }
     }
 
-    public static void removeItemFromMenu(String itemName, String path) {
+    public static void removeItemFromMenu(String itemName, Restaurant restaurant, String path) {
         List<String[]> lines = new ArrayList<>();
         String line;
         boolean found = false;
@@ -164,7 +165,7 @@ public class CSVOperations {
             while ((line = br.readLine()) != null) {
                 String[] cells = line.split(",");
 
-                if (cells[1].trim().equals(itemName)) {
+                if (cells[1].trim().equals(itemName) && Integer.parseInt(cells[5].trim()) == restaurant.getId()){
                     found = true;
                     continue;
                 }
@@ -239,6 +240,81 @@ public class CSVOperations {
         lines = lines.subList(1, lines.size());
         
         return lines;
+    }
+
+    public static List<Restaurant> loadRestaurants(String path) {
+        List<Restaurant> restaurants = new ArrayList<>();
+        List<String[]> lines = new ArrayList<>();
+        lines = getFileLines(path);
+
+        for (String[] restaurant : lines) {
+            Integer id = Integer.parseInt(restaurant[0].trim());
+            String name = restaurant[1].trim();
+            String address = restaurant[2].trim();
+            Restaurant newRestaurant = new Restaurant(id, name, address);
+            restaurants.add(newRestaurant);
+        }
+
+        return restaurants;
+    }
+
+    public static void addRestaurant(Restaurant restaurant) {
+        List<String[]> lines = new ArrayList<>();
+        String line;
+        String path = "data/restaurants.csv";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            while ((line = br.readLine()) != null) {
+                String[] cells = line.split(",");
+                if (cells[1].trim().equals(restaurant.getName()) && cells[2].trim().equals(restaurant.getAddress())) {
+                    System.out.println("Restaurant already exists.");
+                    return;
+                }
+
+                lines.add(cells);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            FileWriter fw = new FileWriter(path, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            bw.write((lines.size()) + ", " + restaurant.getName() + ", " + restaurant.getAddress());
+            bw.newLine();
+
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    // * Find restaurant by id
+    public static Restaurant getRestaurantById(int id) {
+        List<Restaurant> restaurants = loadRestaurants("data/restaurants.csv");
+
+        for (Restaurant restaurant : restaurants) {
+            if (restaurant.getId() == id) {
+                return restaurant;
+            }
+        }
+
+        return null;
+    }
+
+    // * Find restaurant by name and address
+    public static Restaurant getRestaurantByNameAndAddress(String name, String address) {
+        List<Restaurant> restaurants = loadRestaurants("data/restaurants.csv");
+
+        for (Restaurant restaurant : restaurants) {
+            if (restaurant.getName().equals(name) && restaurant.getAddress().equals(address)) {
+                return restaurant;
+            }
+        }
+
+        return null;
     }
 
 }
