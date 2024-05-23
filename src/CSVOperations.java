@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.format.DateTimeFormatter;  
+import java.time.LocalDateTime;    
 
 public class CSVOperations {
     public static List<User> loadUsers(String path) {
@@ -242,6 +244,8 @@ public class CSVOperations {
         return lines;
     }
 
+    /* Restaurant actions */
+
     public static List<Restaurant> loadRestaurants(String path) {
         List<Restaurant> restaurants = new ArrayList<>();
         List<String[]> lines = new ArrayList<>();
@@ -256,6 +260,25 @@ public class CSVOperations {
         }
 
         return restaurants;
+    }
+
+    public static void writeRestaurants(String path, List<String[]> restaurants) {
+        try {
+            FileWriter fw = new FileWriter(path);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            bw.write("id,  name,  address");
+            bw.newLine();
+
+            for (String[] restaurant : restaurants) {
+                bw.write(String.join(", ", restaurant));
+                bw.newLine();
+            }
+
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void addRestaurant(Restaurant restaurant) {
@@ -317,4 +340,122 @@ public class CSVOperations {
         return null;
     }
 
+    public static List<Restaurant> getAvailableRestaurants(String item_name, Menu menu) {
+        List<Restaurant> restaurants = new ArrayList<>();
+        for (FoodItem item : menu.getItems()) {
+            if (item.getName().equals(item_name) && item.isAvailable()) {
+                Restaurant restaurant = getRestaurantById(item.getRestaurantId());
+                restaurants.add(restaurant);
+            }
+        }
+
+        return restaurants;
+    }
+
+    /* Cart operations */
+
+    public static void addCartItemToFile(CartItem item, String path) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+        LocalDateTime now = LocalDateTime.now();  
+        
+        try {
+            FileWriter fw = new FileWriter(path, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            bw.write(item.getCartId() + ", " + item.getRestaurantId() + ", " + item.getName() + ", " + item.getQuantity() + ", " + item.getPrice() + ", " + dtf.format(now));
+            bw.newLine();
+
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Cart getCart(int user_id) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+        LocalDateTime now = LocalDateTime.now();  
+
+        List<String[]> lines = CSVOperations.getFileLines("data/cart.csv");
+        boolean found = false;
+        int cart_id = -1;
+
+        for (String[] line : lines) {
+            if (Integer.parseInt(line[1].trim()) == user_id) {
+                found = true;
+                cart_id = Integer.parseInt(line[0].trim());
+                break;
+            }
+        }
+
+        if (!found) {
+            cart_id = lines.size() + 1;
+            try {
+                FileWriter fw = new FileWriter("data/cart.csv", true);
+                BufferedWriter bw = new BufferedWriter(fw);
+
+                bw.write(cart_id + ", " + user_id + ", " + dtf.format(now));
+                bw.newLine();
+
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return new Cart(new ArrayList<>(), cart_id);
+        } else {
+            List<String[]> cartItemLines = CSVOperations.getFileLines("data/cartItem.csv");
+            List<CartItem> items = new ArrayList<>();
+            for (String[] line : cartItemLines) {
+                if (Integer.parseInt(line[0].trim()) == cart_id) {
+                    cart_id = Integer.parseInt(line[0].trim());
+                    int restaurant_id = Integer.parseInt(line[1].trim());
+                    String name = line[2].trim();
+                    int quantity = Integer.parseInt(line[3].trim());
+                    double price = Double.parseDouble(line[4].trim());
+                    CartItem item = new CartItem(name, quantity, price, restaurant_id, cart_id);
+                    items.add(item);
+                }
+            }
+
+            return new Cart(items, cart_id);
+        }
+    }
+
+    public static void updateCartItemInFile(CartItem item, String path) {
+        List<String[]> lines = CSVOperations.getFileLines(path);
+        boolean found = false;
+
+        for (String[] line : lines) {
+            if (Integer.parseInt(line[0].trim()) == item.getCartId() && line[2].trim().equals(item.getName())) {
+                line[3] = Integer.toString(item.getQuantity());
+                found = true;
+            }
+        }
+
+        if (!found) {
+            System.out.println("Item not found.");
+            return;
+        }
+
+        CSVOperations.writeCartItems(path, lines);
+    }
+
+    public static void writeCartItems(String path, List<String[]> cartItems) {
+        try {
+            FileWriter fw = new FileWriter(path);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            bw.write("cart_id,  restaurant_id,  product,  quantity,  price,  created_at");
+            bw.newLine();
+
+            for (String[] item : cartItems) {
+                bw.write(String.join(", ", item));
+                bw.newLine();
+            }
+
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

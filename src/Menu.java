@@ -8,6 +8,10 @@ public class Menu {
         this.items = items;
     }
 
+    public List<FoodItem> getItems() {
+        return items;
+    }
+
     public void displayMenu() {
         System.out.println("\nMenu:");
         for (int i = 0; i < items.size(); i++) {

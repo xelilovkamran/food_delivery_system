@@ -1,1 +1,1 @@
-cart_id, product, quantity, created_at, updated_at
+cart_id,  restaurant_id,  product,  quantity,  price,  created_at

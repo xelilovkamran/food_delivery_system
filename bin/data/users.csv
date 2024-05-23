@@ -1,3 +1,4 @@
 id, name, email, password, balance, is_superuser
-1, Kamran, xlilovkamran@gmail.com, 123456, 100, true 
-2, Nicat, nicat@gmail.com, 741852, 120, false
+1, Kamran, xlilovkamran@gmail.com, 123456, 100, false 
+2, Nicat, nicat@gmail.com, 741852, 0, true
+3, Elvin, elvin@gmail.com, 123456, 100, false

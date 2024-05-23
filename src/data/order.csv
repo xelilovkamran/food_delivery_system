@@ -1,1 +1,1 @@
-food, user_id, amount, total_price, delivery_address, payment_type, restaurant_id, is_paid, additional_notes, created_at
+user_id, food, amount, total_price, delivery_address, payment_type, restaurant_id, is_paid, additional_notes, created_at
