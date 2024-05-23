@@ -355,8 +355,8 @@ public class CSVOperations {
     /* Cart operations */
 
     public static void addCartItemToFile(CartItem item, String path) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
-        LocalDateTime now = LocalDateTime.now();  
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
         
         try {
             FileWriter fw = new FileWriter(path, true);
@@ -420,8 +420,8 @@ public class CSVOperations {
             return new Cart(items, cart_id);
         }
     }
-
     public static void updateCartItemInFile(CartItem item, String path) {
+        // What is it?
         List<String[]> lines = CSVOperations.getFileLines(path);
         boolean found = false;
 
@@ -439,6 +439,8 @@ public class CSVOperations {
 
         CSVOperations.writeCartItems(path, lines);
     }
+
+    // Function to remove cartItem
 
     public static void writeCartItems(String path, List<String[]> cartItems) {
         try {
