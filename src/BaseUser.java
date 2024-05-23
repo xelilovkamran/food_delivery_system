@@ -37,6 +37,12 @@ public class BaseUser {
         return "\nName: " + this.name + "\nEmail: " + this.email + "\nPassword: " + this.password;
     }
 
+    /**
+     * @param password the new password
+     * @return void
+     * 
+     * This method updates the password of the user and updates the csv file
+     */
     public void setPassword(String password) {
         if (CSVOperations.updatePassword("./data/users.csv", this.email, password)) {
             System.out.println("Password updated successfully");
@@ -47,6 +53,12 @@ public class BaseUser {
         this.password = password;
     }
 
+    /**
+     * @param email the new email
+     * @return void
+     * 
+     * This method updates the email of the user and updates the csv file
+     */
     public void setEmail(String email) {
         if (CSVOperations.updateEmail("./data/users.csv", this.email, email)) {
             System.out.println("Email updated successfully");

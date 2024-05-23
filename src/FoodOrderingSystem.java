@@ -63,12 +63,17 @@ class FoodOrderingSystem {
             }
         } while (choice != 3);
 
-
-        
-
         scanner.close();
     }
 
+    /**
+     * @param scanner the scanner object
+     * @param email the email of the user
+     * @param password the password of the user
+     * @return void
+     * 
+     * This method is used to perform customer actions
+     */
     public static void customerActions(Scanner scanner, String email, String password) {
         int choice = -1;
         User user = CSVOperations.getUser(email, password);
@@ -166,6 +171,14 @@ class FoodOrderingSystem {
         } while (choice != 9);
     }
 
+    /**
+     * @param scanner the scanner object
+     * @param email the email of the user
+     * @param password the password of the user
+     * @return void
+     * 
+     * This method is used to perform manager actions
+     */
     public static void managerActions(Scanner scanner, String email, String password) {
         int choice = -1;
         Admin admin = CSVOperations.getAdmin(email, password);

@@ -17,10 +17,6 @@ public class CartItem {
         return quantity * price;
     }
 
-    public String toString() {
-        return name + " x " + quantity + " @ $" + price + " = $" + getTotalPrice();
-    }
-
     public String getName() {
         return name;
     }
@@ -43,5 +39,15 @@ public class CartItem {
     
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    /**
+     * @return String
+     * 
+     * This method returns the information about the cart item
+     * in the format "name x quantity @ price = total price"
+     */
+    public String toString() {
+        return name + " x " + quantity + " @ $" + price + " = $" + getTotalPrice();
     }
 }

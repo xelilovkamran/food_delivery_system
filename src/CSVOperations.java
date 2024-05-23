@@ -8,7 +8,16 @@ import java.util.List;
 import java.time.format.DateTimeFormatter;  
 import java.time.LocalDateTime;    
 
+/**
+ * This class contains the methods to perform operations on CSV files
+ */
 public class CSVOperations {
+    /**
+     * @param path the path to the file
+     * @return List<String[]>
+     * 
+     * This method reads the file and returns a list of User objects
+     */
     public static List<User> loadUsers(String path) {
         List<User> users = new ArrayList<>();
         List<String[]> lines = new ArrayList<>();
@@ -28,6 +37,14 @@ public class CSVOperations {
         return users;
     }
 
+    /**
+     * @param email the email of the user
+     * @param password the password of the user
+     * @return User
+     * 
+     * This method returns the user object if the email and password match
+     * otherwise it returns null
+     */
     public static User getUser(String email, String password) {
         List<User> users = loadUsers("data/users.csv");
 
@@ -40,6 +57,15 @@ public class CSVOperations {
         return null;
     }
 
+    /**
+     * @param email the email of the user
+     * @param password the password of the user
+     * @return Admin
+     * 
+     * This method returns the admin object if the email and password match
+     * and the user is a superuser
+     * otherwise it returns null
+     */
     public static Admin getAdmin(String email, String password) {
         List<User> users = loadUsers("data/users.csv");
 
@@ -56,6 +82,16 @@ public class CSVOperations {
         return null;
     }
 
+    /**
+     * @param path the path to the file
+     * @param email the email of the user
+     * @param newPassword the new password
+     * @return boolean
+     * 
+     * This method updates the password of the user with the given email in the file at the given path
+     * and returns true if the password is updated successfully
+     * otherwise it returns false
+     */
     public static boolean updatePassword(String path, String email, String newPassword) {
         List<String[]> userLines = new ArrayList<>();
         boolean updated = false;
@@ -74,6 +110,16 @@ public class CSVOperations {
         return updated;
     }
 
+    /**
+     * @param path the path to the file
+     * @param email the email of the user
+     * @param newEmail the new email
+     * @return boolean
+     * 
+     * This method updates the email of the user with the given email in the file at the given path
+     * and returns true if the email is updated successfully
+     * otherwise it returns false
+     */
     public static boolean updateEmail(String path, String email, String newEmail) {
         List<String[]> userLines = new ArrayList<>();
         boolean updated = false;
@@ -97,6 +143,16 @@ public class CSVOperations {
         return updated;
     }
 
+    /**
+     * @param path the path to the file
+     * @param email the email of the user
+     * @param amount the amount to update the balance
+     * @return boolean
+     * 
+     * This method updates the balance of the user with the given email in the file at the given path
+     * and returns true if the balance is updated successfully
+     * otherwise it returns false
+     */
     public static boolean updateBalance(String path, String email, double amount) {
         List<String[]> userLines = new ArrayList<>();
         boolean updated = false;
@@ -117,6 +173,13 @@ public class CSVOperations {
         return updated;
     }
 
+    /**
+     * @param userLines the list of user lines from the users file
+     * @param email the email of the user
+     * 
+     * This method returns true if the user is available in the users file
+     * otherwise it returns false
+     */
     public static boolean userIsAvailableInUsers(List<String[]> userLines, String email) {
         for (String[] userLine : userLines) {
             if (userLine[2].trim().equals(email)) {
@@ -127,6 +190,12 @@ public class CSVOperations {
         return false;
     }
 
+    /**
+     * @param path the path to the file
+     * @return Menu
+     * 
+     * This method reads the file and returns a Menu object
+     */
     public static Menu loadMenu(String path) {
         List<FoodItem> items = new ArrayList<>();
         List<String[]> lines = new ArrayList<>();
@@ -147,6 +216,16 @@ public class CSVOperations {
         return new Menu(items);
     }
 
+    /**
+     * @param item the item to add to the menu
+     * @param restaurantId the id of the restaurant
+     * @param path the path to the file
+     * @return void
+     * 
+     * This method adds an item to the menu file at the given path
+     * if the item already exists, it prints "Item already exists."
+     * otherwise it adds the item to the file
+     */
     public static void addItemToMenu(FoodItem item, Integer restaurantId, String path) {
         List<String[]> lines = new ArrayList<>();
         String line;
@@ -178,6 +257,18 @@ public class CSVOperations {
         }
     }
 
+    /**
+     * @param itemName the name of the item to remove
+     * @param restaurant the restaurant object
+     * @param path the path to the file
+     * @return void
+     * 
+     * This method removes an item from the menu file at the given path
+     * if the item is not found, it prints "Item not found."
+     * otherwise it removes the item from the file
+     * 
+     * Note: The first line of the file is the header
+     */
     public static void removeItemFromMenu(String itemName, Restaurant restaurant, String path) {
         List<String[]> lines = new ArrayList<>();
         String line;
@@ -208,6 +299,15 @@ public class CSVOperations {
         CSVOperations.writeMenu(path, lines);
     }
 
+    /**
+     * @param path the path to the file
+     * @param menu the menu lines to write to the file
+     * @return void
+     * 
+     * This method writes the menu to the file at the given path
+     * 
+     * Note: The first line of the file is the header
+     */
     public static void writeMenu(String path, List<String[]> menu) {
         try {
             FileWriter fw = new FileWriter(path);
@@ -227,6 +327,15 @@ public class CSVOperations {
         }
     }
 
+    /**
+     * @param path the path to the file
+     * @param users the list of user lines to write to the file
+     * @return void
+     * 
+     * This method writes the users to the file at the given path
+     * 
+     * Note: The first line of the file is the header
+     */
     public static void writeUsers(String path, List<String[]> users) {
         try {
             FileWriter fw = new FileWriter(path);
@@ -246,6 +355,14 @@ public class CSVOperations {
         }
     }
 
+    /**
+     * @param path the path to the file
+     * @return List<String[]>
+     * 
+     * This method reads the file and returns a list of lines
+     * 
+     * Note: The first line of the file is the header
+     */
     public static List<String[]> getFileLines(String path) {
         List<String[]> lines = new ArrayList<>();
         String line;
@@ -264,8 +381,14 @@ public class CSVOperations {
         return lines;
     }
 
-    /* Restaurant actions */
+    /* RESTAURANT ACTIONS */
 
+    /**
+     * @param path the path to the file
+     * @return List<Restaurant>
+     * 
+     * This method reads the file and returns a list of Restaurant objects
+     */
     public static List<Restaurant> loadRestaurants(String path) {
         List<Restaurant> restaurants = new ArrayList<>();
         List<String[]> lines = new ArrayList<>();
@@ -282,6 +405,15 @@ public class CSVOperations {
         return restaurants;
     }
 
+    /**
+     * @param path the path to the file
+     * @param restaurants the list of restaurant lines to write to the file
+     * @return void
+     * 
+     * This method writes the restaurants to the file at the given path
+     * 
+     * Note: The first line of the file is the header
+     */
     public static void writeRestaurants(String path, List<String[]> restaurants) {
         try {
             FileWriter fw = new FileWriter(path);
@@ -301,6 +433,14 @@ public class CSVOperations {
         }
     }
 
+    /**
+     * @param restaurant the restaurant to add to the file
+     * @return void
+     * 
+     * This method adds a restaurant to the file at the given path
+     * if the restaurant already exists, it prints "Restaurant already exists."
+     * otherwise it adds the restaurant to the file
+     */
     public static void addRestaurant(Restaurant restaurant) {
         List<String[]> lines = new ArrayList<>();
         String line;
@@ -333,8 +473,13 @@ public class CSVOperations {
         }
     }
 
-
-    // * Find restaurant by id
+    /**
+     * @param id the id of the restaurant
+     * @return Restaurant
+     * 
+     * This method returns the restaurant object with the given id
+     * otherwise it returns null
+     */
     public static Restaurant getRestaurantById(int id) {
         List<Restaurant> restaurants = loadRestaurants("data/restaurants.csv");
 
@@ -347,7 +492,14 @@ public class CSVOperations {
         return null;
     }
 
-    // * Find restaurant by name and address
+    /**
+     * @param name the name of the restaurant
+     * @param address the address of the restaurant
+     * @return Restaurant
+     * 
+     * This method returns the restaurant object with the given name and address
+     * otherwise it returns null
+     */
     public static Restaurant getRestaurantByNameAndAddress(String name, String address) {
         List<Restaurant> restaurants = loadRestaurants("data/restaurants.csv");
 
@@ -360,6 +512,13 @@ public class CSVOperations {
         return null;
     }
 
+    /**
+     * @param item_name the name of the item
+     * @param menu the menu object
+     * @return List<Restaurant>
+     * 
+     * This method returns a list of restaurants that have the given item available from the menu
+     */
     public static List<Restaurant> getAvailableRestaurants(String item_name, Menu menu) {
         List<Restaurant> restaurants = new ArrayList<>();
         for (FoodItem item : menu.getItems()) {
@@ -372,8 +531,15 @@ public class CSVOperations {
         return restaurants;
     }
 
-    /* Cart operations */
+    /* CART OPERATIONS */
 
+    /**
+     * @param item the item to add to the cart
+     * @param path the path to the file
+     * @return void
+     * 
+     * This method adds a cart item to the file at the given path 
+     */
     public static void addCartItemToFile(CartItem item, String path) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
@@ -391,6 +557,14 @@ public class CSVOperations {
         }
     }
 
+    /**
+     * @param user_id the id of the user
+     * @return Cart
+     * 
+     * This method returns the cart object of the user with the given id
+     * if the cart does not exist, it creates a new cart and adds it to the file, then returns the cart object
+     * otherwise it returns the cart object
+     */
     public static Cart getCart(int user_id) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
         LocalDateTime now = LocalDateTime.now();  
@@ -441,8 +615,16 @@ public class CSVOperations {
         }
     }
 
+    /**
+     * @param item the item to add to the cart
+     * @param path the path to the file
+     * @return void
+     * 
+     * This method updates quantity of the cart item in the file at the given path
+     * if the item is not found, it prints "Item not found."
+     * otherwise it updates the quantity of the item in the file 
+     */
     public static void updateCartItemInFile(CartItem item, String path) {
-        // What is it?
         List<String[]> lines = CSVOperations.getFileLines(path);
         boolean found = false;
 
@@ -461,6 +643,15 @@ public class CSVOperations {
         CSVOperations.writeCartItems(path, lines);
     }
 
+    /**
+     * @param item the item to delete from the cart
+     * @param path the path to the file
+     * @return void
+     * 
+     * This method deletes the cart item from the file at the given path
+     * if the item is not found, it prints "Item not found."
+     * otherwise it deletes the item from the file
+     */
     public static void deleteCartItemFromFile(CartItem item, String path) {
         List<String[]> lines = new ArrayList<>();
         String line;
@@ -470,10 +661,12 @@ public class CSVOperations {
             while ((line = br.readLine()) != null) {
                 String[] cells = line.split(",");
 
+                // Skip the header
                 if (cells[0].trim().equals("cart_id")) {
                     continue;
                 }
 
+                // Check if the item is found
                 if (Integer.parseInt(cells[0].trim()) == item.getCartId() && cells[2].trim().equals(item.getName()) && Integer.parseInt(cells[1].trim()) == item.getRestaurantId()) {
                     System.out.println("Item removed from cart.");
                     found = true;
@@ -491,12 +684,18 @@ public class CSVOperations {
             return;
         }
 
-        // lines = lines.subList(1, lines.size());
         CSVOperations.writeCartItems(path, lines);
     }
 
-    // Function to remove cartItem
-
+    /**
+     * @param path the path to the file
+     * @param cartItems the list of cart item lines to write to the file
+     * @return void
+     * 
+     * This method writes the cart items to the file at the given path
+     * 
+     * Note: The first line of the file is the header
+     */
     public static void writeCartItems(String path, List<String[]> cartItems) {
         try {
             FileWriter fw = new FileWriter(path);
@@ -516,6 +715,15 @@ public class CSVOperations {
         }
     }
 
+    /**
+     * @param path the path to the file
+     * @param carts the list of cart lines to write to the file
+     * @return void
+     * 
+     * This method writes the carts to the file at the given path
+     * 
+     * Note: The first line of the file is the header
+     */
     public static void writeCarts(String path, List<String[]> carts) {
         try {
             FileWriter fw = new FileWriter(path);
@@ -537,13 +745,25 @@ public class CSVOperations {
     }
 
 
-    /*! Order Actions  */
+    /* ORDER ACTIONS  */
 
+    /**
+     * @param path the path to the file
+     * @param cart the cart object
+     * @param user the user object
+     * @param address the address of the user
+     * @param instructions the additional notes for the order
+     * @return boolean
+     * 
+     * This method places an order for the cart and user at the given path with the given address and instructions
+     * and returns true if the order is placed successfully
+     * otherwise it returns false
+     */
     public static boolean placeOrder(String path, Cart cart, User user, String address, String instructions) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
 
-        // add item to orders file
+        // * add item to orders file
         try {
             FileWriter fw = new FileWriter(path, true);
             BufferedWriter bw = new BufferedWriter(fw);
@@ -559,7 +779,7 @@ public class CSVOperations {
             return false;
         }
 
-        // remove cart item from cartItem file
+        // * remove cart item from cartItem file
         List<String[]> cartItemLines = CSVOperations.getFileLines("data/cartItem.csv");
         List<String[]> newCartItems = new ArrayList<>();
 
@@ -571,7 +791,7 @@ public class CSVOperations {
 
         CSVOperations.writeCartItems("data/cartItem.csv", newCartItems);
 
-        // update cart in cart file
+        // * update cart in cart file
         List<String[]> cartLines = CSVOperations.getFileLines("data/cart.csv");
         List<String[]> newCartLines = new ArrayList<>();
 

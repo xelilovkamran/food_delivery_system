@@ -12,15 +12,27 @@ public class User extends BaseUser {
         this.balance = balance;
     }
 
+    /**
+     * @return void
+     * 
+     * This method is used to check the balance of the user
+     */
     public void checkBalance() {
         System.out.println("Your balance is: $" + this.balance);
     }
 
+    /**
+     * @param amount the amount to recharge
+     * @return void
+     * 
+     * This method is used to recharge the balance of the user
+     */
     public void rechargeBalance(double amount) {
         Random rnd = new Random();
         int number = rnd.nextInt(999999);
         String code =  String.format("%06d", number);
 
+        // * this code is used to display a notification in the system tray
         try {
             SystemTray tray = SystemTray.getSystemTray();
 
@@ -36,6 +48,7 @@ public class User extends BaseUser {
               System.err.print(ex);
         }
 
+        // * this code is used to read the code from the user
         String input = System.console().readLine("Enter the code to recharge your balance: ");
 
         if (input.equals(code)) {
@@ -50,6 +63,12 @@ public class User extends BaseUser {
         }
     }
 
+    /**
+     * @param amount the amount to withdraw
+     * @return void
+     * 
+     * This method is used to withdraw the balance of the user and update the csv file
+     */
     public void withdrawBalance(double amount) {
         if (this.balance >= amount) {
             if (CSVOperations.updateBalance("./data/users.csv", this.getEmail(), -amount)) {
@@ -63,6 +82,12 @@ public class User extends BaseUser {
         }
     }
 
+    /**
+     * @param cart the cart object
+     * @return void
+     * 
+     * This method is used to place an order, it takes the delivery address and instructions from the user and calls the placeOrder method from the CSVOperations class to place the order and update the csv file
+     */
     public void placeOrder(Cart cart) {
         System.out.println("Enter delivery address:");
         String address = System.console().readLine();
@@ -70,16 +95,21 @@ public class User extends BaseUser {
         System.out.println("If you have any special instructions, please enter them below: (if not, type .)");
         String instructions = System.console().readLine();
 
-        
+        // * inside the if statement, we are calling the placeOrder method from the CSVOperations class to place the order and update the csv file
         if (CSVOperations.placeOrder("./data/order.csv", cart, this, address, instructions)) {
-            this.withdrawBalance(cart.getTotalPrice());
-            cart.setItems(new ArrayList<CartItem>());
+            this.withdrawBalance(cart.getTotalPrice()); // withdraw the total price from the user's balance
+            cart.setItems(new ArrayList<CartItem>()); // clear the cart
             System.out.println("Order placed successfully.");
         } else {
             System.out.println("An error occurred while placing the order.");
         }
     }
 
+    /**
+     * @return void
+     * 
+     * This method is used to view the order history of the user
+     */
     public void viewOrderHistory() {
         List<String[]> orders = CSVOperations.getFileLines("./data/order.csv");
 

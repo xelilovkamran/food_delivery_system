@@ -12,6 +12,11 @@ public class Menu {
         return items;
     }
 
+    /**
+     * @return void
+     * 
+     * This method displays the menu items
+     */
     public void displayMenu() {
         System.out.println("\nMenu:");
         for (int i = 0; i < items.size(); i++) {
@@ -21,11 +26,25 @@ public class Menu {
         }
     }
 
+    /**
+     * @param item the item to add
+     * @param restaurantId the id of the restaurant
+     * @return void
+     * 
+     * This method adds an item to the menu and writes the changes to the file
+     */
     public void addItem(FoodItem item, Integer restaurantId) {
         CSVOperations.addItemToMenu(item, restaurantId,  "./data/menu.csv");
         items.add(item);
     }
 
+    /**
+     * @param itemName the name of the item to remove
+     * @param restaurant the restaurant object
+     * @return void
+     * 
+     * This method removes an item from the menu and writes the changes to the file
+     */
     public void removeItem(String itemName, Restaurant restaurant) {
         CSVOperations.removeItemFromMenu(itemName, restaurant, "./data/menu.csv");
         
@@ -38,6 +57,14 @@ public class Menu {
         }
     }
 
+    /**
+     * @param itemName the name of the item to update
+     * @param restaurant_name the name of the restaurant
+     * @param restaurant_address the address of the restaurant
+     * @return void
+     * 
+     * This method updates an item in the menu and writes the changes to the file, if the item is not found, it will print an error message
+     */
     public void updateItem(String itemName, String restaurant_name, String restaurant_address) {
         boolean found = false;
         List<String[]> lines = CSVOperations.getFileLines("./data/menu.csv");

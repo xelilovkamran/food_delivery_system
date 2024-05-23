@@ -5,6 +5,14 @@ public class Admin extends BaseUser {
         super(id, name, email, password, is_superuser);
     }
 
+    /**
+     * @param name the name of the new admin
+     * @param newPassword the password of the new admin
+     * @param newEmail the email of the new admin
+     * @return void
+     * 
+     * This method adds a new admin to the users.csv file
+     */
     public void addNewAdmin(String name, String newPassword, String newEmail) {
         List<String[]> userLines = CSVOperations.getFileLines("data/users.csv");
         if (!CSVOperations.userIsAvailableInUsers(userLines, newEmail)) {
@@ -15,6 +23,12 @@ public class Admin extends BaseUser {
         }
     }
 
+    /**
+     * @param emailToRemove the email of the user to remove
+     * @return void
+     * 
+     * This method removes a user from the users.csv file by email
+     */
     public void removeUser(String emailToRemove) {
         List<String[]> userLines = CSVOperations.getFileLines("data/users.csv");
         if (!CSVOperations.userIsAvailableInUsers(userLines, emailToRemove)) {
@@ -32,11 +46,25 @@ public class Admin extends BaseUser {
         System.out.println("User removed.");
     }
 
+    /**
+     * @param restaurantName the name of the new restaurant
+     * @param restaurantAddress the address of the new restaurant
+     * @return void
+     * 
+     * This method adds a new restaurant to the restaurants.csv file
+     */
     public void addNewRestaurant(String restaurantName, String restaurantAddress) {
-        Restaurant restaurant = new Restaurant(-1, restaurantName, restaurantAddress);
+        Restaurant restaurant = new Restaurant(-1, restaurantName, restaurantAddress); // id is -1 because it will be auto incremented in the csv file
         CSVOperations.addRestaurant(restaurant);
     }
 
+    /**
+     * @param restaurantName the name of the restaurant to remove
+     * @param restaurantAddress the address of the restaurant to remove
+     * @return void
+     * 
+     * This method removes a restaurant from the restaurants.csv file by name and address
+     */
     public void removeRestaurant(String restaurantName, String restaurantAddress) {
         Restaurant restaurant = CSVOperations.getRestaurantByNameAndAddress(restaurantName, restaurantAddress);
 

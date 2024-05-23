@@ -33,25 +33,30 @@ class FoodItem {
         return restaurant_id;
     }
 
+    
+    public void setPrice(double price) {
+        this.price = price;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    public void setAvailability(boolean is_available) {
+        this.is_available = is_available;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    /**
+     * @return String
+     * 
+     * This method returns the information about the food item
+     */
     public String getFoodInfo() {
         Restaurant restaurant = CSVOperations.getRestaurantById(this.restaurant_id);
         return "\nName: " + this.name + "; Price: " + this.price + "; Description: " + this.description + "; Available: " + this.is_available + "; Restaurant: " + restaurant.getName() + "; Address: " + restaurant.getAddress() + "\n";
     }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setAvailability(boolean is_available) {
-        this.is_available = is_available;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
 }

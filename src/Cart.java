@@ -26,6 +26,12 @@ public class Cart {
     }
 
 
+    /**
+     * @return double
+     * 
+     * This method calculates the total price of all items in the cart
+     * by iterating over the items and summing the total price of each item
+     */
     public double getTotalPrice() {
         double total = 0;
         for (CartItem item : items) {
@@ -34,7 +40,13 @@ public class Cart {
         return total;
     }
 
-    // Please, explain it
+    /**
+     * @return String
+     * 
+     * This method returns the information about the cart
+     * in the format "1. item1 x quantity1 @ price1 = total price1"
+     * It iterates over the items and appends the information about each item to the StringBuilder
+     */
     public String toString() {
         StringBuilder sb = new StringBuilder();
         int index = 1;
@@ -47,9 +59,20 @@ public class Cart {
     }
 
 
+    /**
+     * @param menu the menu object
+     * @param item_name the name of the item
+     * @param quantity the quantity of the item
+     * @param restaurant the restaurant object
+     * @return void
+     * 
+     * This method adds an item to the cart by checking if the item is already in the cart and updating the quantity if it is,
+     * or by checking if the item is in the menu and adding it to the cart if it is not already there
+     */
     public void addToCart(Menu menu, String item_name, int quantity,  Restaurant restaurant) {
         boolean itemFound = false;
 
+        // * Check if the item is already in the cart and update the quantity
         for (CartItem item : this.getItems()) {
             if (item.getName().equals(item_name) && item.getRestaurantId() == restaurant.getId()){
                 item.setQuantity(item.getQuantity() + quantity);
@@ -59,6 +82,7 @@ public class Cart {
             }
         }
 
+        // * Check if the item is in the menu and add it to the cart if it is not already there
         for (FoodItem item : menu.getItems()) {
             if (item.getName().equals(item_name) && item.isAvailable() && item.getRestaurantId() == restaurant.getId()){
                 itemFound = true;
@@ -75,6 +99,14 @@ public class Cart {
         }
     }
 
+    /**
+     * @param itemIndex the index of the item to remove
+     * @param quantityToRemove the quantity to remove
+     * @return void
+     * 
+     * This method removes an item from the cart by checking if the item is in the cart and updating the quantity if it is,
+     * or by removing the item from the cart if the quantity to remove is equal to the quantity of the item
+     */
     public void removeItem(int itemIndex, int quantityToRemove) {
         System.out.println(this.getItems().size());
         if (itemIndex > this.getItems().size() || itemIndex < 1) {
