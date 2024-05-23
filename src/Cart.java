@@ -31,8 +31,9 @@ public class Cart {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        int index = 1;
         for (CartItem item : items) {
-            sb.append(item.toString());
+            sb.append(index++ + " " + item.toString());
             sb.append("\n");
         }
         sb.append("Total: $" + getTotalPrice());

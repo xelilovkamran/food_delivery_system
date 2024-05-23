@@ -129,11 +129,12 @@ class FoodOrderingSystem {
                 case 3:
                     System.out.println(cart.toString());
                     break;
-                // case 4:
-                //     System.out.print("Enter item number to remove from cart: ");
-                //     int removeIndex = scanner.nextInt() - 1;
-                //     user.removeFromCart(removeIndex);
-                //     break;
+                case 4:
+                    System.out.println(cart.toString());
+                    // System.out.println("Enter item name to remove: ");
+                    // name = scanner.nextLine();
+                    
+                    break;
                 // case 5:
                 //     user.checkBalance();
                 //     break;
