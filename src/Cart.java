@@ -21,6 +21,10 @@ public class Cart {
         items.add(item);
     }
 
+    public void setItems(List<CartItem> items) {
+        this.items = items;
+    }
+
 
     public double getTotalPrice() {
         double total = 0;

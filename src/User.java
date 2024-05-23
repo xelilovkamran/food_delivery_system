@@ -1,8 +1,8 @@
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.TrayIcon.MessageType;
-import java.net.MalformedURLException;
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User extends BaseUser {
     private double balance;
@@ -47,6 +47,56 @@ public class User extends BaseUser {
             }
         } else {
             System.out.println("Invalid code.");
+        }
+    }
+
+    public void withdrawBalance(double amount) {
+        if (this.balance >= amount) {
+            if (CSVOperations.updateBalance("./data/users.csv", this.getEmail(), -amount)) {
+                this.balance -= amount;
+                System.out.println("Balance withdrawn successfully.");
+            } else {
+                System.out.println("An error occurred while withdrawing your balance.");
+            }
+        } else {
+            System.out.println("Insufficient balance.");
+        }
+    }
+
+    public void placeOrder(Cart cart) {
+        System.out.println("Enter delivery address:");
+        String address = System.console().readLine();
+
+        System.out.println("If you have any special instructions, please enter them below: (if not, type .)");
+        String instructions = System.console().readLine();
+
+        
+        if (CSVOperations.placeOrder("./data/order.csv", cart, this, address, instructions)) {
+            this.withdrawBalance(cart.getTotalPrice());
+            cart.setItems(new ArrayList<CartItem>());
+            System.out.println("Order placed successfully.");
+        } else {
+            System.out.println("An error occurred while placing the order.");
+        }
+    }
+
+    public void viewOrderHistory() {
+        List<String[]> orders = CSVOperations.getFileLines("./data/order.csv");
+
+        for (String[] order : orders) {
+            if (this.getId() == Integer.parseInt(order[0])) {
+                System.out.println("************************************");
+                System.out.println("Order ID: " + order[0]);
+                System.out.println("Order Date: " + order[9]);
+                System.out.println("Delivery Address: " + order[4]);
+                System.out.println("Item: " + order[1]);
+                System.out.println("quantity: " + order[2]);
+                System.out.println("Total Price: " + order[3] + "$");
+                if (!order[8].trim().equals(".")) {
+                    System.out.println("Instructions: " + order[8]);
+                } 
+                System.out.println("************************************");
+            }
         }
     }
 }

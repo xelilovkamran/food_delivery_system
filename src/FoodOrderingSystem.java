@@ -130,6 +130,10 @@ class FoodOrderingSystem {
                     System.out.println(cart.toString());
                     break;
                 case 4:
+                    if (cart.getItems().size() == 0) {
+                        System.out.println("Cart is empty.");
+                        break;
+                    }
                     System.out.println(cart.toString());
                     System.out.println("Enter item number to remove: ");
                     int choiceToRemove = scanner.nextInt();
@@ -147,15 +151,15 @@ class FoodOrderingSystem {
                     double amount = scanner.nextDouble();
                     user.rechargeBalance(amount);
                     break;
-                // case 7:
-                //     user.placeOrder();
-                //     break;
-                // case 8:
-                //     user.viewOrderHistory();
-                //     break;
-                // case 9:
-                //     System.out.println("Exiting...");
-                //     break;
+                case 7:
+                    user.placeOrder(cart);
+                    break;
+                case 8:
+                    user.viewOrderHistory();
+                    break;
+                case 9:
+                    System.out.println("Exiting...");
+                    break;
                 default:
                     System.out.println("Invalid choice. Please enter a number between 1 and 9.");
             }

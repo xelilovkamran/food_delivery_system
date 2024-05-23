@@ -515,4 +515,75 @@ public class CSVOperations {
             e.printStackTrace();
         }
     }
+
+    public static void writeCarts(String path, List<String[]> carts) {
+        try {
+            FileWriter fw = new FileWriter(path);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            bw.write("id,  user_id,  created_at");
+            bw.newLine();
+
+            for (String[] cart : carts) {
+                bw.write(String.join(", ", cart));
+                bw.newLine();
+            }
+
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    /*! Order Actions  */
+
+    public static boolean placeOrder(String path, Cart cart, User user, String address, String instructions) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+
+        // add item to orders file
+        try {
+            FileWriter fw = new FileWriter(path, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            for (CartItem item : cart.getItems()) {
+                bw.write(user.getId()  + ", " + item.getName() + ", " + item.getQuantity() + ", " + item.getPrice() * item.getQuantity() + ", " + address.replaceAll(",", " ") + ", " + "balance, " + item.getRestaurantId() + ", " + true + ", " + instructions + ", " + dtf.format(now));
+                bw.newLine();
+            }
+
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        // remove cart item from cartItem file
+        List<String[]> cartItemLines = CSVOperations.getFileLines("data/cartItem.csv");
+        List<String[]> newCartItems = new ArrayList<>();
+
+        for (String[] line : cartItemLines) {
+            if (Integer.parseInt(line[0].trim()) != cart.getId()) {
+                newCartItems.add(line);
+            }
+        }
+
+        CSVOperations.writeCartItems("data/cartItem.csv", newCartItems);
+
+        // update cart in cart file
+        List<String[]> cartLines = CSVOperations.getFileLines("data/cart.csv");
+        List<String[]> newCartLines = new ArrayList<>();
+
+        for (String[] line : cartLines) {
+            if (Integer.parseInt(line[0].trim()) == cart.getId()) {
+                line[2] = dtf.format(now);
+            }
+            newCartLines.add(line);
+        }
+
+        CSVOperations.writeCarts("data/cart.csv", newCartLines);
+
+        return true;
+    }
 }

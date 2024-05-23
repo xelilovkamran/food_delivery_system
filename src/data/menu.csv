@@ -1,7 +1,7 @@
-id,  name,  price,  description,  is_available, restaurant_id
-1,  fries,  5.0,  This is a fries,  true,  1
-2,  hamburger,  6.0,  This is a hamburger,  false,  1
-3,  Pizza,  8.0,  this is a pizza,  true,  2
-4,  hotdog,  5.6,  this is a hotdog,  true,  3
-5,  pasta,  3.0,  this is a pasta,  true,  4
+id, name, price, description, is_available, restaurant_id
+1, fries, 5.0, This is a fries, true, 1
+2, hamburger, 6.0, This is a hamburger, false, 1
+3, Pizza, 8.0, this is a pizza, true, 2
+4, hotdog, 5.6, this is a hotdog, true, 3
+5, pasta, 3.0, this is a pasta, true, 4
 7, Pizza, 5.0, this is a nice pizza, true, 4
