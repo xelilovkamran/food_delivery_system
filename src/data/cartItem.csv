@@ -1,3 +1,1 @@
 cart_id,  restaurant_id,  product,  quantity,  price,  created_at
-1, 2, Pizza, 2, 8.0, 2024/05/23 16:49:25
-1, 4, pasta, 4, 3.0, 2024/05/23 16:50:22

@@ -21,6 +21,7 @@ public class Cart {
         items.add(item);
     }
 
+
     public double getTotalPrice() {
         double total = 0;
         for (CartItem item : items) {
@@ -29,6 +30,7 @@ public class Cart {
         return total;
     }
 
+    // Please, explain it
     public String toString() {
         StringBuilder sb = new StringBuilder();
         int index = 1;
