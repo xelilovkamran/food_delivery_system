@@ -1,3 +1,8 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.TrayIcon.MessageType;
+import java.net.MalformedURLException;
+import java.util.Random;
 
 public class User extends BaseUser {
     private double balance;
@@ -6,34 +11,43 @@ public class User extends BaseUser {
         super(id, name, email, password, is_superuser);
         this.balance = balance;
     }
-    
-    public void addToCart(Cart cart, Menu menu, String item_name, int quantity,  Restaurant restaurant) {
-        boolean itemFound = false;
 
-        for (CartItem item : cart.getItems()) {
-            if (item.getName().equals(item_name) && item.getRestaurantId() == restaurant.getId()){
-                item.setQuantity(item.getQuantity() + quantity);
-                CSVOperations.updateCartItemInFile(item, "./data/cartItem.csv");
-                System.out.println("Item added to cart.");
-                return;
+    public void checkBalance() {
+        System.out.println("Your balance is: $" + this.balance);
+    }
+
+    public void rechargeBalance(double amount) {
+        Random rnd = new Random();
+        int number = rnd.nextInt(999999);
+        String code =  String.format("%06d", number);
+
+        try {
+            SystemTray tray = SystemTray.getSystemTray();
+
+            Image image = Toolkit.getDefaultToolkit().createImage("icon.png");
+
+            TrayIcon trayIcon = new TrayIcon(image, "Java AWT Tray Demo");
+            trayIcon.setImageAutoSize(true);
+            trayIcon.setToolTip("System tray icon demo");
+            tray.add(trayIcon);
+
+            trayIcon.displayMessage("Code to recharge balance", "Enter this code to recharge: " + code, MessageType.INFO);
+        } catch(Exception ex){
+              System.err.print(ex);
+        }
+
+        String input = System.console().readLine("Enter the code to recharge your balance: ");
+
+        if (input.equals(code)) {
+            if (CSVOperations.updateBalance("./data/users.csv", this.getEmail(), amount)) {
+                this.balance += amount;
+                System.out.println("Balance recharged successfully.");
+            } else {
+                System.out.println("An error occurred while recharging your balance.");
             }
+        } else {
+            System.out.println("Invalid code.");
         }
-
-        for (FoodItem item : menu.getItems()) {
-            if (item.getName().equals(item_name) && item.isAvailable() && item.getRestaurantId() == restaurant.getId()){
-                itemFound = true;
-                CartItem cartItem = new CartItem(item.getName(), quantity, item.getPrice(), restaurant.getId(), cart.getId());
-                cart.addItem(cartItem);
-                CSVOperations.addCartItemToFile(cartItem, "./data/cartItem.csv");
-                System.out.println("Item added to cart.");
-                return;
-            }
-        }
-
-        if (!itemFound) {
-            System.out.println("Item not found or unavailable. Please try again.");
-        }
-        
     }
 }
 

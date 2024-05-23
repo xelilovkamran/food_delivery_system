@@ -97,6 +97,26 @@ public class CSVOperations {
         return updated;
     }
 
+    public static boolean updateBalance(String path, String email, double amount) {
+        List<String[]> userLines = new ArrayList<>();
+        boolean updated = false;
+
+        userLines = getFileLines(path);
+
+        for (String[] userLine : userLines) {
+            if (userLine[2].trim().equals(email)) {
+                double balance = Double.parseDouble(userLine[4].trim());
+                balance += amount;
+                userLine[4] = Double.toString(balance);
+                updated = true;
+                break;
+            }
+        }
+
+        CSVOperations.writeUsers(path, userLines);
+        return updated;
+    }
+
     public static boolean userIsAvailableInUsers(List<String[]> userLines, String email) {
         for (String[] userLine : userLines) {
             if (userLine[2].trim().equals(email)) {
@@ -420,6 +440,7 @@ public class CSVOperations {
             return new Cart(items, cart_id);
         }
     }
+
     public static void updateCartItemInFile(CartItem item, String path) {
         // What is it?
         List<String[]> lines = CSVOperations.getFileLines(path);
@@ -437,6 +458,40 @@ public class CSVOperations {
             return;
         }
 
+        CSVOperations.writeCartItems(path, lines);
+    }
+
+    public static void deleteCartItemFromFile(CartItem item, String path) {
+        List<String[]> lines = new ArrayList<>();
+        String line;
+        boolean found = false;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            while ((line = br.readLine()) != null) {
+                String[] cells = line.split(",");
+
+                if (cells[0].trim().equals("cart_id")) {
+                    continue;
+                }
+
+                if (Integer.parseInt(cells[0].trim()) == item.getCartId() && cells[2].trim().equals(item.getName()) && Integer.parseInt(cells[1].trim()) == item.getRestaurantId()) {
+                    System.out.println("Item removed from cart.");
+                    found = true;
+                    continue;
+                }
+
+                lines.add(cells);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (!found) {
+            System.out.println("Item not found.");
+            return;
+        }
+
+        // lines = lines.subList(1, lines.size());
         CSVOperations.writeCartItems(path, lines);
     }
 

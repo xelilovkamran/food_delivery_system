@@ -122,7 +122,7 @@ class FoodOrderingSystem {
                     if (restaurant == null) {
                         System.out.println("Restaurant not found.");
                     } else {
-                        user.addToCart(cart, menu, name, quantity, restaurant);
+                        cart.addToCart(menu, name, quantity, restaurant);
                     }
 
                     break;
@@ -131,18 +131,22 @@ class FoodOrderingSystem {
                     break;
                 case 4:
                     System.out.println(cart.toString());
-                    // System.out.println("Enter item name to remove: ");
-                    // name = scanner.nextLine();
+                    System.out.println("Enter item number to remove: ");
+                    int choiceToRemove = scanner.nextInt();
+                    System.out.println("Enter quantity to remove: ");
+                    int quantityToRemove = scanner.nextInt();
                     
+                    cart.removeItem(choiceToRemove, quantityToRemove);
+
                     break;
-                // case 5:
-                //     user.checkBalance();
-                //     break;
-                // case 6:
-                //     System.out.print("Enter amount to recharge: $");
-                //     double amount = scanner.nextDouble();
-                //     user.rechargeBalance(amount);
-                //     break;
+                case 5:
+                    user.checkBalance();
+                    break;
+                case 6:
+                    System.out.print("Enter amount to recharge: $");
+                    double amount = scanner.nextDouble();
+                    user.rechargeBalance(amount);
+                    break;
                 // case 7:
                 //     user.placeOrder();
                 //     break;
