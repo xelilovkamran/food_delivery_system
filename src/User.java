@@ -69,16 +69,19 @@ public class User extends BaseUser {
      * 
      * This method is used to withdraw the balance of the user and update the csv file
      */
-    public void withdrawBalance(double amount) {
+    public boolean withdrawBalance(double amount) {
         if (this.balance >= amount) {
             if (CSVOperations.updateBalance("./data/users.csv", this.getEmail(), -amount)) {
                 this.balance -= amount;
                 System.out.println("Balance withdrawn successfully.");
+                return true;
             } else {
                 System.out.println("An error occurred while withdrawing your balance.");
+                return false;
             }
         } else {
             System.out.println("Insufficient balance.");
+            return false;
         }
     }
 
@@ -96,7 +99,8 @@ public class User extends BaseUser {
         String instructions = System.console().readLine();
 
         // * inside the if statement, we are calling the placeOrder method from the CSVOperations class to place the order and update the csv file
-        if (CSVOperations.placeOrder("./data/order.csv", cart, this, address, instructions)) {
+        if (this.withdrawBalance(cart.getTotalPrice())) {
+            CSVOperations.placeOrder("./data/order.csv", cart, this, address, instructions);
             this.withdrawBalance(cart.getTotalPrice()); // withdraw the total price from the user's balance
             cart.setItems(new ArrayList<CartItem>()); // clear the cart
             System.out.println("Order placed successfully.");
