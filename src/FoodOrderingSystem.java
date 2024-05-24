@@ -277,14 +277,7 @@ class FoodOrderingSystem {
 
                     System.out.println("Enter item price: ");
 
-                    if (scanner.hasNextDouble()) {
-                        price = scanner.nextDouble();
-                    } else {
-                        System.out.println("Invalid input. Please enter a valid price.");
-                        scanner.next();
-                        break;
-                    }
-                    scanner.nextLine();
+                    price = Double.parseDouble(scanner.nextLine());
 
                     System.out.println("Enter item description: ");
                     description = scanner.nextLine();
